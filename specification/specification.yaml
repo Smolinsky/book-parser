@@ -1,0 +1,153 @@
+openapi: 3.0.0
+info:
+  title: BookParser API
+  description: API documentation for BookParser application
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /books:
+    get:
+      summary: Get all books
+      description: Retrieve a list of books with search filters
+      tags:
+        - Book
+      parameters:
+        - name: search
+          in: query
+          description: Filter tasks by title, description, name of author
+          required: false
+          schema:
+            type: string
+            default: Some
+      responses:
+        200:
+          description: List of books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+
+  /authors/{authorId}:
+    get:
+      summary: Get author by ID
+      description: Retrieve author book info by ID
+      tags:
+        - Book
+      parameters:
+        - name: authorId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Author book details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+
+  /authors:
+    get:
+      summary: Get all authors
+      description: Retrieve a list of authors with search filters
+      tags:
+        - Author
+      parameters:
+        - name: search
+          in: query
+          description: Filter tasks by name of author
+          required: false
+          schema:
+            type: string
+            default: Some
+      responses:
+        200:
+          description: List of authors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Author'
+
+components:
+  schemas:
+    AccessToken:
+      type: object
+      properties:
+        access_token:
+          type: string
+      example:
+        access_token: 'your_access_token'
+
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "Book name"
+        description:
+          type: string
+          example: "Book description"
+        published_date:
+          type: string
+          format: date
+          example: "2025-04-30"
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Author'
+
+    Author:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Author name"
+        books_count:
+          type: integer
+          example: 400
+
+  responses:
+    ValidationErrorResponse:
+      description: Validation error occurred
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Invalid input"
+
+    UnauthenticatedErrorResponse:
+      description: Unauthorized request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Unauthenticated"
+
+    BadRequestErrorResponse:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Invalid email format"
