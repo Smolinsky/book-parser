@@ -14,7 +14,8 @@ class Book extends Model
     protected $fillable = [
         'title',
         'description',
-        'published_date'
+        'published_date',
+        'isbn'
     ];
 
     protected $casts = [

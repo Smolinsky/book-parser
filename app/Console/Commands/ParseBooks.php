@@ -12,29 +12,40 @@ class ParseBooks extends Command
 
     protected $description = 'Parse books from JSON and insert in database';
 
-    public function handle()
+    public function handle(): void
     {
         $data = $this->fetchBooks();
 
-        foreach ($data as $item) {
-            $publishedDate = isset($item['publishedDate']['$date'])
-                ? date('Y-m-d', strtotime($item['publishedDate']['$date']))
-                : null;
+        foreach (array_chunk($data, 100) as $chunkIndex => $booksChunk) {
+            $this->info("Processing chunk {$chunkIndex}...");
 
-            $book = Book::updateOrCreate(
-                ['title' => $item['title']],
-                [
-                    'description' => $item['longDescription'] ?? null,
-                    'published_date' => $publishedDate ?? null,
-                ]
-            );
+            foreach ($booksChunk as $item) {
+                if (!isset($item['isbn'])) {
+                    $this->warn("Skipping book without ISBN: ".($item['title'] ?? 'Unknown title'));
+                    continue;
+                }
 
-            foreach ($item['authors'] as $authorName) {
-                $author = Author::firstOrCreate([
-                    'name' => $authorName
-                ]);
-                $book->authors()->syncWithoutDetaching($author->id);
+                $publishedDate = isset($item['publishedDate']['$date'])
+                    ? date('Y-m-d', strtotime($item['publishedDate']['$date']))
+                    : null;
+
+                $book = Book::updateOrCreate(
+                    ['isbn' => $item['isbn']],
+                    [
+                        'title' => $item['title'],
+                        'description' => $item['longDescription'] ?? null,
+                        'published_date' => $publishedDate ?? null,
+                    ]
+                );
+
+                foreach ($item['authors'] as $authorName) {
+                    $author = Author::firstOrCreate([
+                        'name' => $authorName
+                    ]);
+                    $book->authors()->syncWithoutDetaching($author->id);
+                }
             }
+            gc_collect_cycles();
         }
 
         $this->info('Books parsed successfully!');
