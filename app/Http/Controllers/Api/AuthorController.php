@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AuthorResource;
 use App\Services\AuthorService;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class AuthorController extends Controller
 {
@@ -13,7 +14,7 @@ class AuthorController extends Controller
     {
     }
 
-    public function showAuthors(Request $request)
+    public function showAuthors(Request $request): AnonymousResourceCollection
     {
         $authors = $this->authorService->getAuthors($request->all());
 

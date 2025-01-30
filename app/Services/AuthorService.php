@@ -4,12 +4,13 @@ namespace App\Services;
 
 use App\Models\Author;
 use App\Traits\Filterable;
+use Illuminate\Support\Collection;
 
 class AuthorService
 {
     use Filterable;
 
-    public function getAuthors(array $filters = [])
+    public function getAuthors(array $filters = []): Collection
     {
         $query = Author::withCount('books');
 

@@ -19,7 +19,7 @@ class BookService
         return $query->get();
     }
 
-    public function getBooksByAuthor(int $authorId)
+    public function getBooksByAuthor(int $authorId): Collection
     {
         return Book::whereHas('authors', function ($query) use ($authorId) {
             $query->where('authors.id', $authorId);

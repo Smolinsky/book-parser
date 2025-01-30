@@ -2,9 +2,11 @@
 
 namespace App\Traits;
 
+use Illuminate\Database\Eloquent\Builder;
+
 trait Filterable
 {
-    public function applyFilters($query, array $filters, string $modelType = 'book'): void
+    public function applyFilters(Builder $query, array $filters, string $modelType = 'book'): void
     {
         if (!empty($filters['search'])) {
             if ($modelType === 'book') {
